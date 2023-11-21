@@ -44,6 +44,8 @@ fn main() -> ExitCode {
 
     let res = run();
 
+    let _unused = 9;
+
     println!("took {:?}", start.elapsed());
 
     match res {
