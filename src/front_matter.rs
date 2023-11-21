@@ -4,6 +4,8 @@ use serde_yaml::{Mapping, Value};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FrontMatter {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
     pub nav: Vec<NavElem>,
 }
 

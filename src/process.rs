@@ -28,17 +28,35 @@ fn process_content(path: &Path, name: Option<String>) -> Result<(NavPage, Option
     let (fm, content) = md::take_front_matter(&raw)?;
 
     let built_content = md::build(content);
-    let fixed_content = md::fix(content);
+    let mut fixed_content = md::fix(content);
 
+    if let Some(fm) = &fm {
+        fixed_content = md::prepend_front_matter(fm, &fixed_content);
+    }
+
+    // enforce all files having a title
     let title_h1 = unwrap!(
         md::extract_title_h1(content),
-        "couldn't extract title from {path}"
+        "all files must have an h1 title, but couldn't extract one from {path}"
     );
+
+    // if fm specifies a name, use it over an assigned name
+    // this is mainly only useful for the root index.md
+    let name = if let Some(fm_name) = fm.as_ref().and_then(|fm| fm.name.as_ref()) {
+        ensure!(
+            name.is_none(),
+            "cannot specify both a fm name and a nav name for {path}"
+        );
+
+        fm_name.clone()
+    } else {
+        name.unwrap_or(title_h1)
+    };
 
     Ok((
         NavPage {
             path: path.clone(),
-            name: name.unwrap_or(title_h1),
+            name,
             raw_content: raw,
             built_content,
             fixed_content,
@@ -59,11 +77,9 @@ pub fn process_page(path: &Path, name: Option<String>) -> Result<NavPage> {
 }
 
 pub fn process_index(path: &Path, name: Option<String>) -> Result<NavIndex> {
-    let (mut page, fm) = process_content(path, name)?;
+    let (page, fm) = process_content(path, name)?;
 
     let fm = unwrap!(fm, "index page {path} is missing front matter");
-
-    page.fixed_content = md::prepend_front_matter(&fm, &page.fixed_content);
 
     Ok(NavIndex { page, fm })
 }
