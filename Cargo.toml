@@ -1,0 +1,20 @@
+[package]
+name = "nr-spec-md"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.70"
+description = "Build & Validation Tool for the Inertya Specification"
+authors = ["Sky <sky@sky9.dev>"]
+repository = "https://github.com/inertya/nr-spec-md"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+anyhow = "1"
+semver = { version = "1", features = ["serde"] }
+
+pulldown-cmark = "0.9"
+pulldown-cmark-to-cmark = "11.0.1"
+
+serde = { version = "1", features = ["derive"] }
+serde_yaml = "0.9"
+toml = "0.8"
