@@ -43,6 +43,8 @@ fn main() -> ExitCode {
     let start = Instant::now();
 
     let res = run();
+    
+    let unused = 9;
 
     println!("took {:?}", start.elapsed());
 
