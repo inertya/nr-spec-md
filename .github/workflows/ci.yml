@@ -109,3 +109,5 @@ jobs:
       - clippy
       - fmt
       - test
+    steps:
+      - run: echo "dummy message because github requires all jobs to have at least 1 step"
