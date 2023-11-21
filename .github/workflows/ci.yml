@@ -23,14 +23,42 @@ jobs:
         rust-channel: [stable, beta, nightly]
         os: [ubuntu, windows]
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@master
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{matrix.rust-channel}}
           components: clippy
-      - run: cargo clippy --all-targets
-      - run: cargo clippy --all-features --all-targets
-      - run: cargo clippy --no-default-features --all-targets
+
+      - name: Clippy, Default Features
+        run: cargo clippy --all-targets
+      - name: Clippy, All Features
+        run: cargo clippy --all-features --all-targets
+      - name: Clippy, No Features
+        run: cargo clippy --no-default-features --all-targets
+
+  fmt:
+    name: Rustfmt ${{matrix.rust-channel}}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        rust-channel: [stable, beta, nightly]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{matrix.rust-channel}}
+          components: rustfmt
+
+      - name: Check Formatting
+        run: cargo fmt --all --check
 
   test:
     name: Test ${{matrix.rust-channel}} ${{matrix.os == 'windows' && '(windows)' || ''}}
@@ -42,10 +70,17 @@ jobs:
         rust-channel: [stable, beta, nightly]
         os: [ubuntu, windows]
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@master
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{matrix.rust-channel}}
-      - run: cargo test --all-targets
-      - run: cargo test --all-features --all-targets
-      - run: cargo test --no-default-features --all-targets
+
+      - name: Test Default Features
+        run: cargo test --all-targets
+      - name: Test All Features
+        run: cargo test --all-features --all-targets
+      - name: Test No Features
+        run: cargo test --no-default-features --all-targets
