@@ -1,7 +1,7 @@
 #![forbid(unsafe_code)]
 
 use crate::config::{Config, ConfigFile, Mode};
-use crate::modes::{mode_check, mode_fix};
+use crate::modes::{mode_build, mode_check, mode_fix};
 use crate::path::Path;
 use crate::process::process_folder;
 use anyhow::{bail, ensure, Context, Result};
@@ -19,6 +19,7 @@ macro_rules! unwrap {
 mod config;
 mod front_matter;
 mod md;
+mod mkdocs;
 mod modes;
 mod nav;
 mod path;
@@ -75,7 +76,7 @@ fn run() -> Result<()> {
     let root = process_folder(&Path::new(&config.file.build.source), None)?;
 
     match config.mode {
-        Mode::Build => todo!(),
+        Mode::Build => mode_build(root, &config),
         Mode::Check => mode_check(root),
         Mode::Fix => mode_fix(root),
     }

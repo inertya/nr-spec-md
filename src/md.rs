@@ -26,19 +26,36 @@ const C2C_OPTIONS: C2cOptions = C2cOptions {
     strong_token: "**",
 };
 
+// transform nr-specific syntax to mkdocs syntax
+// specifically for admonitions and stuff
 pub fn build(content: &str) -> String {
-    // TODO build
+    // adapt(content, |p| {
+    //     yield;
+    // })
     content.to_string()
 }
 
 pub fn fix(content: &str) -> String {
+    // convert to events and then back to a string
+    // easiest way to get a consistent style
+    adapt(content, |p| p)
+}
+
+// pull-push-pull :|
+// this is just a convince to avoid all the options and other boilerplate
+fn adapt<'a, I>(content: &str, f: impl FnOnce(Parser) -> I) -> String
+where
+    I: IntoIterator<Item = Event<'a>>,
+{
     let parser = Parser::new_ext(content, MD_OPTIONS);
     // decent guess for cap to try and avoid reallocating
     let mut buf = String::with_capacity(content.len().next_power_of_two());
 
+    let iter = f(parser).into_iter();
+
     // error is a fmt::Error, which the string fmt::Write impl never returns, so unwrap should never panic
     // discarding the state cuz we dont need it
-    let _ = pulldown_cmark_to_cmark::cmark_with_options(parser, &mut buf, C2C_OPTIONS).unwrap();
+    let _ = pulldown_cmark_to_cmark::cmark_with_options(iter, &mut buf, C2C_OPTIONS).unwrap();
 
     // pulldown c2c doesn't keep the trailing newline for some reason
     buf.push('\n');
@@ -72,7 +89,9 @@ pub fn extract_title_h1(content: &str) -> Result<String> {
 }
 
 pub fn take_front_matter(content: &str) -> Result<(Option<FrontMatter>, &str)> {
-    let Some(s) = content.strip_prefix("---") else { return Ok((None, content)) };
+    let Some(s) = content.strip_prefix("---") else {
+        return Ok((None, content));
+    };
 
     let Some((fm, remaining)) = s.split_once("\n---") else {
         bail!("unclosed front matter block")
