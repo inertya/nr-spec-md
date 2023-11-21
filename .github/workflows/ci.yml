@@ -9,56 +9,72 @@ on:
   pull_request:
   workflow_dispatch:
 
-env:
-  RUSTFLAGS: -Dwarnings
-
 jobs:
   clippy:
-    name: Clippy ${{matrix.rust-channel}} ${{matrix.os == 'windows' && '(windows)' || ''}}
+    name: Clippy ${{matrix.os == 'windows' && '(windows)' || ''}}
     runs-on: ${{matrix.os}}-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        rust-channel: [stable, beta, nightly]
         os: [ubuntu, windows]
+    env:
+      RUSTFLAGS: -Dwarnings
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@master
+      - name: Install Rust Stable
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: ${{matrix.rust-channel}}
           components: clippy
 
-      - name: Clippy, Default Features
-        run: cargo clippy --all-targets
-      - name: Clippy, All Features
-        run: cargo clippy --all-features --all-targets
-      - name: Clippy, No Features
-        run: cargo clippy --no-default-features --all-targets
+      - name: Install Rust Beta
+        uses: dtolnay/rust-toolchain@beta
+        with:
+          components: clippy
+
+      - name: Install Rust Nightly
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: clippy
+
+      - name: Clippy (stable)
+        run: cargo +stable clippy --all-features --all-targets --workspace && cargo clean
+      - name: Clippy (beta)
+        run: cargo +beta clippy --all-features --all-targets --workspace && cargo clean
+      - name: Clippy (nightly)
+        run: cargo +nightly clippy --all-features --all-targets --workspace && cargo clean
 
   fmt:
-    name: Rustfmt ${{matrix.rust-channel}}
+    name: Rustfmt
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        rust-channel: [stable, beta, nightly]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@master
+      - name: Install Rust Stable
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: ${{matrix.rust-channel}}
           components: rustfmt
 
-      - name: Check Formatting
-        run: cargo fmt --all --check
+      - name: Install Rust Beta
+        uses: dtolnay/rust-toolchain@beta
+        with:
+          components: rustfmt
+
+      - name: Install Rust Nightly
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+
+      - name: Check Formatting (stable)
+        run: cargo +stable fmt --all --check
+      - name: Check Formatting (beta)
+        run: cargo +beta fmt --all --check
+      - name: Check Formatting (nightly)
+        run: cargo +nightly fmt --all --check
 
   test:
     name: Test ${{matrix.rust-channel}} ${{matrix.os == 'windows' && '(windows)' || ''}}
@@ -79,8 +95,8 @@ jobs:
           toolchain: ${{matrix.rust-channel}}
 
       - name: Test Default Features
-        run: cargo test --all-targets
+        run: cargo test --all-targets --workspace
       - name: Test All Features
-        run: cargo test --all-features --all-targets
+        run: cargo test --all-features --all-targets --workspace
       - name: Test No Features
-        run: cargo test --no-default-features --all-targets
+        run: cargo test --no-default-features --all-targets --workspace
