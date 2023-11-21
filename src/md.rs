@@ -43,7 +43,7 @@ pub fn fix(content: &str) -> String {
 
 // pull-push-pull :|
 // this is just a convince to avoid all the options and other boilerplate
-fn adapt<'a, I>(content: &str, f: impl FnOnce(Parser) -> I) -> String
+fn adapt<'a, I>(content: &'a str, f: impl FnOnce(Parser<'a, 'a>) -> I) -> String
 where
     I: IntoIterator<Item = Event<'a>>,
 {
