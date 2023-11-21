@@ -7,6 +7,7 @@ description = "Build & Validation Tool for the Inertya Specification"
 authors = ["Sky <sky@sky9.dev>"]
 repository = "https://github.com/inertya/nr-spec-md"
 license = "MIT OR Apache-2.0"
+exclude = [".github"]
 
 [dependencies]
 anyhow = "1"
