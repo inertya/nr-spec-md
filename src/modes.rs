@@ -5,6 +5,8 @@ use std::io::Write;
 use crate::config::Config;
 
 pub fn mode_build(root: NavFolder, config: &Config) -> Result<()> {
+    let _ = root;
+    let _ = config;
     Ok(())
 }
 
