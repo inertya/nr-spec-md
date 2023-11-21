@@ -1,0 +1,50 @@
+name: CI
+
+permissions:
+  contents: read
+  pull-requests: read
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  RUSTFLAGS: -Dwarnings
+
+jobs:
+  clippy:
+    name: Clippy ${{matrix.rust-channel}}, ${{matrix.os}}
+    runs-on: ${{matrix.os}}-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        rust-channel: [stable, beta, nightly]
+        os: [ubuntu, windows]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{matrix.rust-channel}}
+      - run: cargo clippy --all-targets
+      - run: cargo clippy --all-features --all-targets
+      - run: cargo clippy --no-features --all-targets
+
+  test:
+    name: Test ${{matrix.rust-channel}}, ${{matrix.os}}
+    runs-on: ${{matrix.os}}-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        rust-channel: [stable, beta, nightly]
+        os: [ubuntu, windows]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{matrix.rust-channel}}
+      - run: cargo test --all-targets
+      - run: cargo test --all-features --all-targets
+      - run: cargo test --no-features --all-targets
