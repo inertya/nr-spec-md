@@ -1,8 +1,8 @@
+use crate::config::Config;
 use crate::nav::{ForEachPage, NavFolder};
 use anyhow::{anyhow, Context, Result};
 use std::fs::File;
 use std::io::Write;
-use crate::config::Config;
 
 pub fn mode_build(root: NavFolder, config: &Config) -> Result<()> {
     let _ = root;

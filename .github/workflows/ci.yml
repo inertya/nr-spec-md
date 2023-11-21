@@ -14,7 +14,7 @@ env:
 
 jobs:
   clippy:
-    name: Clippy ${{matrix.rust-channel}}, ${{matrix.os}}
+    name: Clippy ${{matrix.rust-channel}} ${{matrix.os == 'windows' && '(windows)' || ''}}
     runs-on: ${{matrix.os}}-latest
     timeout-minutes: 30
     strategy:
@@ -27,12 +27,13 @@ jobs:
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{matrix.rust-channel}}
+          components: clippy
       - run: cargo clippy --all-targets
       - run: cargo clippy --all-features --all-targets
-      - run: cargo clippy --no-features --all-targets
+      - run: cargo clippy --no-default-features --all-targets
 
   test:
-    name: Test ${{matrix.rust-channel}}, ${{matrix.os}}
+    name: Test ${{matrix.rust-channel}} ${{matrix.os == 'windows' && '(windows)' || ''}}
     runs-on: ${{matrix.os}}-latest
     timeout-minutes: 30
     strategy:
@@ -47,4 +48,4 @@ jobs:
           toolchain: ${{matrix.rust-channel}}
       - run: cargo test --all-targets
       - run: cargo test --all-features --all-targets
-      - run: cargo test --no-features --all-targets
+      - run: cargo test --no-default-features --all-targets
