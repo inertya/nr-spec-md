@@ -9,9 +9,6 @@ on:
   pull_request:
   workflow_dispatch:
 
-env:
-  RUSTFLAGS: -Dwarnings
-
 jobs:
   clippy:
     name: Clippy ${{matrix.os == 'windows' && '(windows)' || ''}}
@@ -21,6 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu, windows]
+    env:
+      RUSTFLAGS: -Dwarnings
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
