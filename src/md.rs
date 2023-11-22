@@ -88,9 +88,9 @@ pub fn extract_title_h1(content: &str) -> Result<String> {
     Ok(title)
 }
 
-pub fn take_front_matter(content: &str) -> Result<(Option<FrontMatter>, &str)> {
+pub fn take_front_matter(content: &str) -> Result<(FrontMatter, &str)> {
     let Some(s) = content.strip_prefix("---") else {
-        return Ok((None, content));
+        return Ok((FrontMatter::default(), content));
     };
 
     let Some((fm, remaining)) = s.split_once("\n---") else {
@@ -103,5 +103,11 @@ pub fn take_front_matter(content: &str) -> Result<(Option<FrontMatter>, &str)> {
 pub fn prepend_front_matter(fm: &FrontMatter, content: &str) -> String {
     let fm_yaml = serde_yaml::to_string(fm).expect("ser error????");
 
-    format!("---\n{fm_yaml}---\n{content}")
+    // FIXME use a better check
+    if fm_yaml.trim() == "{}" {
+        // dont put an empty fm block
+        content.to_string()
+    } else {
+        format!("---\n{fm_yaml}---\n{content}")
+    }
 }

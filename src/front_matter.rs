@@ -2,10 +2,14 @@ use anyhow::{anyhow, bail, ensure, Result};
 use serde::{Deserialize, Serialize};
 use serde_yaml::{Mapping, Value};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Default)]
+#[serde(deny_unknown_fields)]
 pub struct FrontMatter {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
+
+    // converts absent to/from an empty vec
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub nav: Vec<NavElem>,
 }
 

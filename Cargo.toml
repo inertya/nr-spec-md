@@ -14,7 +14,7 @@ anyhow = "1"
 semver = { version = "1", features = ["serde"] }
 
 pulldown-cmark = "0.9"
-pulldown-cmark-to-cmark = "11.0.1"
+pulldown-cmark-to-cmark = "11"
 
 serde = { version = "1", features = ["derive"] }
 serde_yaml = "0.9"
