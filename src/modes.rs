@@ -2,12 +2,14 @@ use crate::config::Config;
 use crate::nav::NavFolder;
 use crate::path::Path;
 use anyhow::{anyhow, Context, Result};
-use log::{error, info};
+use log::{debug, error, info, trace};
 use std::convert::Infallible;
 use std::fs::File;
 use std::io::Write;
 
 pub fn mode_build(root: NavFolder, config: &Config, extra: &[Path]) -> Result<()> {
+    debug!("mode build");
+
     let _ = root;
     let _ = config;
     let _ = extra;
@@ -15,6 +17,8 @@ pub fn mode_build(root: NavFolder, config: &Config, extra: &[Path]) -> Result<()
 }
 
 pub fn mode_check(root: &NavFolder) -> Result<()> {
+    debug!("mode check");
+
     let mut total = 0;
     let mut fails = 0;
 
@@ -25,6 +29,8 @@ pub fn mode_check(root: &NavFolder) -> Result<()> {
         if page.fixed_content != page.raw_content {
             error!("Fix: {}", page.path);
             fails += 1;
+        } else {
+            debug!("pass: {:?}", page.path);
         }
 
         Ok::<(), Infallible>(())
@@ -44,6 +50,8 @@ pub fn mode_check(root: &NavFolder) -> Result<()> {
 }
 
 pub fn mode_fix(root: &NavFolder) -> Result<()> {
+    debug!("mode fix");
+
     let mut fixed = 0;
     let mut total = 0;
 
@@ -51,6 +59,7 @@ pub fn mode_fix(root: &NavFolder) -> Result<()> {
         total += 1;
 
         if page.fixed_content == page.raw_content {
+            debug!("pass: {:?}", page.path);
             return Ok(());
         }
 

@@ -76,6 +76,8 @@ fn run() -> Result<()> {
 
     let config = get_config()?;
 
+    debug!("{config:#?}");
+
     ensure!(
         config.file.version_req.matches(&version),
         "version mismatch: current version is v{}, but config requires {}",
