@@ -47,6 +47,7 @@ fn main() -> ExitCode {
     pretty_env_logger::formatted_builder()
         .filter_level(LevelFilter::Info)
         .format_module_path(false)
+        .format_target(false)
         .parse_default_env()
         .init();
 
