@@ -76,7 +76,6 @@ jobs:
     runs-on: ${{matrix.os}}-latest
     timeout-minutes: 30
     strategy:
-      fail-fast: false
       matrix:
         rust-channel: [stable, beta, nightly]
         os: [ubuntu, windows]
