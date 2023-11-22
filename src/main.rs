@@ -6,7 +6,7 @@ use crate::modes::{mode_build, mode_check, mode_fix};
 use crate::path::Path;
 use crate::process::process_folder;
 use anyhow::{bail, ensure, Context, Result};
-use log::{debug, error, info, warn};
+use log::{debug, error, info, warn, LevelFilter};
 use semver::Version;
 use std::process::ExitCode;
 use std::time::Instant;
@@ -43,7 +43,11 @@ f, fix   - Fixes any style mistakes (will modify src/)
 ";
 
 fn main() -> ExitCode {
-    pretty_env_logger::init();
+    // default to info level
+    pretty_env_logger::formatted_builder()
+        .filter_level(LevelFilter::Info)
+        .parse_default_env()
+        .init();
 
     let start = Instant::now();
 
