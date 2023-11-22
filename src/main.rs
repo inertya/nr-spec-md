@@ -43,9 +43,9 @@ f, fix   - Fixes any style mistakes (will modify src/)
 ";
 
 fn main() -> ExitCode {
-    // default to info level
-    pretty_env_logger::formatted_builder()
+    env_logger::Builder::new()
         .filter_level(LevelFilter::Info)
+        .format_timestamp(None)
         .format_module_path(false)
         .format_target(false)
         .parse_default_env()

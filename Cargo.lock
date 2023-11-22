@@ -141,24 +141,14 @@ name = "nr-spec-md"
 version = "0.1.3"
 dependencies = [
  "anyhow",
+ "env_logger",
  "log",
- "pretty_env_logger",
  "pulldown-cmark",
  "pulldown-cmark-to-cmark",
  "semver",
  "serde",
  "serde_yaml",
  "toml",
-]
-
-[[package]]
-name = "pretty_env_logger"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "865724d4dbe39d9f3dd3b52b88d859d66bcb2d6a0acfd5ea68a65fb66d4bdc1c"
-dependencies = [
- "env_logger",
- "log",
 ]
 
 [[package]]
