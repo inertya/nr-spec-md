@@ -33,7 +33,7 @@ pub enum NavElem {
 
 fn parse_filename(name: Option<String>, mut path: String) -> Result<NavElem> {
     trace!("parse_filename name={name:?} path={path:?}");
-    
+
     ensure!(path != "index.md", "cannot include index files directly");
 
     match path {
