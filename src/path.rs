@@ -1,5 +1,6 @@
 // why cant std::path::Path just implement Display i am tired of writing path.display()
 
+use std::ffi::OsStr;
 use std::fmt::{self, Debug, Display, Formatter};
 use std::path::{Path as StdPath, PathBuf};
 
@@ -7,7 +8,7 @@ use std::path::{Path as StdPath, PathBuf};
 /// thats it.
 /// works as you would expect.
 /// implements Display.
-#[derive(Clone)]
+#[derive(Clone, Eq, PartialEq, Hash)]
 pub struct Path {
     inner: PathBuf,
 }
@@ -23,6 +24,14 @@ impl Path {
         let mut p = self.clone();
         p.inner.push(path);
         p
+    }
+
+    pub fn file_name(&self) -> Option<&OsStr> {
+        self.inner.file_name()
+    }
+
+    pub fn extension(&self) -> Option<&OsStr> {
+        self.inner.extension()
     }
 }
 
