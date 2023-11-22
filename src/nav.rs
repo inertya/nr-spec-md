@@ -8,18 +8,11 @@ pub struct NavPage {
     pub path: Path,
     pub name: String,
 
+    pub fm: FrontMatter,
+
     pub raw_content: String,
     pub built_content: String,
     pub fixed_content: String,
-}
-
-/// An index page (index.md)
-///
-/// name is page.name
-#[derive(Debug)]
-pub struct NavIndex {
-    pub page: NavPage,
-    pub fm: FrontMatter,
 }
 
 /// A folder with an index
@@ -27,7 +20,7 @@ pub struct NavIndex {
 /// name is index.page.name (ignored for root)
 #[derive(Debug)]
 pub struct NavFolder {
-    pub index: NavIndex,
+    pub index: NavPage,
     pub children: Vec<NavItem>,
 }
 
@@ -57,12 +50,6 @@ pub trait ForEachPage {
 impl ForEachPage for NavPage {
     fn for_each_page(&self, f: &mut impl FnMut(&NavPage) -> Result<()>) -> Result<()> {
         f(self)
-    }
-}
-
-impl ForEachPage for NavIndex {
-    fn for_each_page(&self, f: &mut impl FnMut(&NavPage) -> Result<()>) -> Result<()> {
-        self.page.for_each_page(f)
     }
 }
 
