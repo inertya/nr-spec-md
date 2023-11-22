@@ -43,6 +43,8 @@ f, fix   - Fixes any style mistakes (will modify src/)
 ";
 
 fn main() -> ExitCode {
+    pretty_env_logger::init();
+
     let start = Instant::now();
 
     let res = run();
