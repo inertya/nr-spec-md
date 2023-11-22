@@ -28,15 +28,17 @@ pub fn dir_check(dir: &Path, root: &NavFolder) -> Result<DirCheck> {
         trace!("dir_check cb path={path:?}");
 
         if path.extension() != Some("md".as_ref()) {
-            debug!("found extra file: {path}");
+            trace!("found extra file: {path}");
             // if it's not an .md file, it's extra
             extra.push(path);
         } else if !nav_paths.contains(&path) {
-            debug!("found unused file: {path}");
+            trace!("found unused file: {path}");
             // if it's an .md file, and it's not in the nav, it's unused
             unused.push(path);
         }
     })?;
+
+    debug!("dir_check extra: {extra:#?}");
 
     Ok(DirCheck { unused, extra })
 }
