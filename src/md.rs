@@ -101,13 +101,17 @@ pub fn take_front_matter(content: &str) -> Result<(FrontMatter, &str)> {
 }
 
 pub fn prepend_front_matter(fm: &FrontMatter, content: &str) -> String {
-    let fm_yaml = serde_yaml::to_string(fm).expect("ser error????");
+    let Ok(serde_yaml::Value::Mapping(map)) = serde_yaml::to_value(fm) else {
+        panic!("ser error/fm not a map???");
+    };
 
-    // FIXME use a better check
-    if fm_yaml.trim() == "{}" {
-        // dont put an empty fm block
+    if map.is_empty() {
+        // skip empty fm blocks
         content.to_string()
     } else {
-        format!("---\n{fm_yaml}---\n{content}")
+        format!(
+            "---\n{}---\n{content}",
+            serde_yaml::to_string(&map).unwrap()
+        )
     }
 }
