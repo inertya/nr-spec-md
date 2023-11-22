@@ -1,6 +1,7 @@
 #![forbid(unsafe_code)]
 
 use crate::config::{Config, ConfigFile, Mode};
+use crate::dircheck::{dir_check, DirCheck};
 use crate::modes::{mode_build, mode_check, mode_fix};
 use crate::path::Path;
 use crate::process::process_folder;
@@ -17,6 +18,7 @@ macro_rules! unwrap {
 }
 
 mod config;
+mod dircheck;
 mod front_matter;
 mod md;
 mod mkdocs;
@@ -72,13 +74,24 @@ fn run() -> Result<()> {
         config.file.version_req,
     );
 
+    let src = Path::new(&config.file.build.source);
+
     // this will read and process every file (specified in index navs)
-    let root = process_folder(&Path::new(&config.file.build.source), None)?;
+    let root = process_folder(&src, None)?;
+
+    // print unused files
+    let DirCheck { unused, extra } = dir_check(&src, &root).context("dir check error")?;
+
+    unused
+        .iter()
+        .for_each(|path| eprintln!("Unused file: {path}"));
+
+    //
 
     match config.mode {
-        Mode::Build => mode_build(root, &config),
-        Mode::Check => mode_check(root),
-        Mode::Fix => mode_fix(root),
+        Mode::Build => mode_build(root, &config, &extra),
+        Mode::Check => mode_check(&root),
+        Mode::Fix => mode_fix(&root),
     }
 }
 

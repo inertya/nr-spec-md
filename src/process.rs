@@ -100,11 +100,11 @@ pub fn process_include(dir: &Path, name: String) -> Result<NavCategory> {
             println!("skipping included/* directory {path}");
             continue;
         }
-        if path.as_ref().extension() != Some("md".as_ref()) {
+        if path.extension() != Some("md".as_ref()) {
             println!("skipping included/* non .md file {path}");
             continue;
         }
-        if path.as_ref().file_name() == Some("index.md".as_ref()) {
+        if path.file_name() == Some("index.md".as_ref()) {
             bail!("cannot include/* an index file at {path}");
         }
 
