@@ -1,8 +1,8 @@
 use crate::config::Config;
 use crate::nav::NavFolder;
 use crate::path::Path;
-use anyhow::{anyhow, Context, Result};
-use log::{debug, error, info, trace};
+use anyhow::{anyhow, Result};
+use log::{debug, error, info};
 use std::convert::Infallible;
 use std::fs::File;
 use std::io::Write;
@@ -71,8 +71,14 @@ pub fn mode_fix(root: &NavFolder) -> Result<()> {
             "couldn't open {path} for fixing",
         );
 
-        file.write_all(page.fixed_content.as_bytes())
-            .with_context(|| format!("write error while fixing file {path}"))
+        unwrap!(
+            file.write_all(page.fixed_content.as_bytes()),
+            "write error while fixing file {path}"
+        );
+
+        debug!("fixed {path:?}");
+
+        Ok(())
     })?;
 
     if fixed == 0 {
