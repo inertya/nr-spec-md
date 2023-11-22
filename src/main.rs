@@ -50,8 +50,6 @@ fn main() -> ExitCode {
     env_logger::Builder::new()
         .filter_level(LevelFilter::Info)
         .format_timestamp(None)
-        .format_module_path(false)
-        .format_target(false)
         .parse_default_env()
         .init();
 
@@ -59,15 +57,15 @@ fn main() -> ExitCode {
 
     let res = run();
 
-    debug!("took {:?}", start.elapsed());
+    debug!(target: "", "took {:?}", start.elapsed());
 
     match res {
         Ok(()) => ExitCode::SUCCESS,
         Err(e) => {
-            error!("{e}");
+            error!(target: "", "Fatal: {e}");
             e.chain()
                 .skip(1)
-                .for_each(|cause| error!("Caused by: {cause}"));
+                .for_each(|cause| error!(target: "", "Caused by: {cause}"));
             ExitCode::FAILURE
         }
     }
@@ -76,11 +74,11 @@ fn main() -> ExitCode {
 fn run() -> Result<()> {
     let version = Version::parse(env!("CARGO_PKG_VERSION")).unwrap();
 
-    info!("nr-spec-md v{version}");
+    info!(target: "nr-spec-md", "v{version}");
 
     let config = get_config()?;
 
-    debug!("{config:#?}");
+    debug!(target: "", "{config:#?}");
 
     ensure!(
         config.file.version_req.matches(&version),
@@ -97,7 +95,9 @@ fn run() -> Result<()> {
     // print unused files
     let DirCheck { unused, extra } = dir_check(&src, &root).context("dir check error")?;
 
-    unused.iter().for_each(|path| warn!("Unused file: {path}"));
+    unused
+        .iter()
+        .for_each(|path| warn!(target: "dir_check", "Unused Markdown File: {path}"));
 
     //
 
@@ -132,8 +132,6 @@ fn get_mode() -> Result<Mode> {
         }
         Some(s) => bail!("Unknown mode {s:?}, try `nr-spec-md help`"),
     };
-
-    debug!("Mode: {mode:?}");
 
     Ok(mode)
 }

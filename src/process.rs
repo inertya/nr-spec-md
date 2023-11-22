@@ -98,15 +98,15 @@ pub fn process_include(dir: &Path, name: String) -> Result<NavCategory> {
         let metadata = entry.metadata().unwrap();
 
         if metadata.is_dir() {
-            info!("skipping included/* directory {path}");
+            info!(target: "process_include", "skipping directory {path}");
             continue;
         }
         if path.extension() != Some("md".as_ref()) {
-            info!("skipping included/* non .md file {path}");
+            info!(target: "process_include", "skipping non .md file {path}");
             continue;
         }
         if path.file_name() == Some("index.md".as_ref()) {
-            bail!("cannot include/* an index file at {path}");
+            bail!("process_include: cannot include/* an index file at {path}");
         }
 
         // regular pages can't have nav
