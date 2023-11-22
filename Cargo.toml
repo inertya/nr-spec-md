@@ -2,7 +2,7 @@
 name = "nr-spec-md"
 version = "0.1.3"
 edition = "2021"
-rust-version = "1.70"
+rust-version = "1.70" # keep in sync with .github/workflows/ci.yml
 description = "Build & Validation Tool for the Inertya Specification"
 authors = ["Sky <sky@sky9.dev>"]
 repository = "https://github.com/inertya/nr-spec-md"

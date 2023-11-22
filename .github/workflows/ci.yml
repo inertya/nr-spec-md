@@ -8,6 +8,9 @@ on:
   push:
   pull_request:
 
+env:
+  msrv: 1.70 # keep in sync with Cargo.toml
+
 jobs:
   clippy:
     name: Clippy
@@ -18,6 +21,12 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - id: toolchain-msrv
+        name: Install Rust ${{env.msrv}} (MSRV)
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{env.msrv}}
 
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@stable
@@ -34,6 +43,8 @@ jobs:
         with:
           components: clippy
 
+      - name: Clippy (MSRV)
+        run: cargo +${{steps.toolchain-msrv.outputs.name}} clippy --all-features --all-targets --workspace && cargo clean
       - name: Clippy (stable)
         run: cargo +stable clippy --all-features --all-targets --workspace && cargo clean
       - name: Clippy (beta)
@@ -49,6 +60,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - id: toolchain-msrv
+        name: Install Rust ${{env.msrv}} (MSRV)
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{env.msrv}}
+
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -64,6 +81,8 @@ jobs:
         with:
           components: rustfmt
 
+      - name: Check Formatting (MSRV)
+        run: cargo +${{steps.toolchain-msrv.outputs.name}} fmt --all --check
       - name: Check Formatting (stable)
         run: cargo +stable fmt --all --check
       - name: Check Formatting (beta)
@@ -77,23 +96,34 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        rust-channel: [stable, beta, nightly]
         os: [ubuntu, windows]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Rust
+      - id: toolchain-msrv
+        name: Install Rust ${{env.msrv}} (MSRV)
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: ${{matrix.rust-channel}}
+          toolchain: ${{env.msrv}}
 
-      - name: Test Default Features
-        run: cargo test --all-targets --workspace
-      - name: Test All Features
-        run: cargo test --all-features --all-targets --workspace
-      - name: Test No Features
-        run: cargo test --no-default-features --all-targets --workspace
+      - name: Install Rust Stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Rust Beta
+        uses: dtolnay/rust-toolchain@beta
+
+      - name: Install Rust Nightly
+        uses: dtolnay/rust-toolchain@nightly
+
+      - name: Test (MSRV)
+        run: cargo +${{steps.toolchain-msrv.outputs.name}} test --all-features --all-targets --workspace
+      - name: Test (stable)
+        run: cargo +stable test --all-features --all-targets --workspace
+      - name: Test (beta)
+        run: cargo +beta test --all-features --all-targets --workspace
+      - name: Test (nightly)
+        run: cargo +nightly test --all-features -all-targets --workspace
 
   # just a simple job that requires all other jobs to pass for it to pass
   # used for branch protection rules requiring ci pass (to avoid listing every matrix permutation)
