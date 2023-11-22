@@ -13,7 +13,11 @@ use std::{env, fs};
 
 macro_rules! unwrap {
     ($x:expr, $($fmt:tt)+) => {
-        anyhow::Context::with_context($x, || format!($($fmt)+))?
+        // dont use ? because we don't need the implicit .into() and it breaks some inference
+        match anyhow::Context::with_context($x, || format!($($fmt)+)) {
+            Ok(x) => x,
+            Err(e) => return Err(e),
+        }
     };
 }
 
