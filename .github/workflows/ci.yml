@@ -27,6 +27,7 @@ jobs:
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{env.msrv}}
+          components: clippy
 
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@stable
@@ -65,6 +66,7 @@ jobs:
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{env.msrv}}
+          components: rustfmt
 
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@stable
