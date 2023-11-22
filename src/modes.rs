@@ -2,6 +2,7 @@ use crate::config::Config;
 use crate::nav::NavFolder;
 use crate::path::Path;
 use anyhow::{anyhow, Context, Result};
+use log::{error, info};
 use std::convert::Infallible;
 use std::fs::File;
 use std::io::Write;
@@ -22,7 +23,7 @@ pub fn mode_check(root: &NavFolder) -> Result<()> {
 
         // TODO rich diff?
         if page.fixed_content != page.raw_content {
-            println!("{} needs fixing", page.path);
+            error!("Fix: {}", page.path);
             fails += 1;
         }
 
@@ -35,7 +36,7 @@ pub fn mode_check(root: &NavFolder) -> Result<()> {
     }
 
     if fails == 0 {
-        eprintln!("All {total} files look good!");
+        info!("All {total} files look good!");
         Ok(())
     } else {
         Err(anyhow!("{fails}/{total} files need fixing :("))
@@ -66,9 +67,9 @@ pub fn mode_fix(root: &NavFolder) -> Result<()> {
     })?;
 
     if fixed == 0 {
-        eprintln!("All {total} files look good!");
+        info!("All {total} files look good!");
     } else {
-        eprintln!("Fixed {fixed}/{total} files")
+        info!("Fixed {fixed}/{total} files")
     }
 
     Ok(())

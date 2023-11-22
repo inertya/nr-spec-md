@@ -3,6 +3,7 @@ use crate::md;
 use crate::nav::{NavCategory, NavFolder, NavItem, NavPage};
 use crate::path::Path;
 use anyhow::{anyhow, bail, ensure, Result};
+use log::info;
 use std::fs;
 
 pub fn process_item(elem: &NavElem, dir: &Path) -> Result<NavItem> {
@@ -97,11 +98,11 @@ pub fn process_include(dir: &Path, name: String) -> Result<NavCategory> {
         let metadata = entry.metadata().unwrap();
 
         if metadata.is_dir() {
-            println!("skipping included/* directory {path}");
+            info!("skipping included/* directory {path}");
             continue;
         }
         if path.extension() != Some("md".as_ref()) {
-            println!("skipping included/* non .md file {path}");
+            info!("skipping included/* non .md file {path}");
             continue;
         }
         if path.file_name() == Some("index.md".as_ref()) {

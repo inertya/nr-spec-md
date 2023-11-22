@@ -6,6 +6,7 @@ use crate::modes::{mode_build, mode_check, mode_fix};
 use crate::path::Path;
 use crate::process::process_folder;
 use anyhow::{bail, ensure, Context, Result};
+use log::{debug, error, info, warn};
 use semver::Version;
 use std::process::ExitCode;
 use std::time::Instant;
@@ -46,15 +47,15 @@ fn main() -> ExitCode {
 
     let res = run();
 
-    println!("took {:?}", start.elapsed());
+    debug!("took {:?}", start.elapsed());
 
     match res {
         Ok(()) => ExitCode::SUCCESS,
         Err(e) => {
-            eprintln!("Error: {e}");
+            error!("{e}");
             e.chain()
                 .skip(1)
-                .for_each(|cause| eprintln!("Caused By: {cause}"));
+                .for_each(|cause| error!("Caused by: {cause}"));
             ExitCode::FAILURE
         }
     }
@@ -63,7 +64,7 @@ fn main() -> ExitCode {
 fn run() -> Result<()> {
     let version = Version::parse(env!("CARGO_PKG_VERSION")).unwrap();
 
-    println!("nr-spec-md v{version}");
+    info!("nr-spec-md v{version}");
 
     let config = get_config()?;
 
@@ -82,9 +83,7 @@ fn run() -> Result<()> {
     // print unused files
     let DirCheck { unused, extra } = dir_check(&src, &root).context("dir check error")?;
 
-    unused
-        .iter()
-        .for_each(|path| eprintln!("Unused file: {path}"));
+    unused.iter().for_each(|path| warn!("Unused file: {path}"));
 
     //
 
@@ -120,7 +119,7 @@ fn get_mode() -> Result<Mode> {
         Some(s) => bail!("Unknown mode {s:?}, try `nr-spec-md help`"),
     };
 
-    println!("Mode: {mode:?}");
+    debug!("Mode: {mode:?}");
 
     Ok(mode)
 }
