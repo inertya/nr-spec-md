@@ -125,7 +125,7 @@ jobs:
       - name: Test (beta)
         run: cargo +beta test --all-features --all-targets --workspace
       - name: Test (nightly)
-        run: cargo +nightly test --all-features -all-targets --workspace
+        run: cargo +nightly test --all-features --all-targets --workspace
 
   # just a simple job that requires all other jobs to pass for it to pass
   # used for branch protection rules requiring ci pass (to avoid listing every matrix permutation)
