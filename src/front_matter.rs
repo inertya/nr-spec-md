@@ -43,7 +43,7 @@ fn parse_filename(name: Option<String>, mut path: String) -> Result<NavElem> {
                 path.truncate(path.len() - 2);
                 Ok(NavElem::Include { name, path })
             } else {
-                Err(anyhow!("include {path} must specify a filename"))
+                Err(anyhow!("include {path} must specify a name"))
             }
         }
 
@@ -57,7 +57,7 @@ fn parse_filename(name: Option<String>, mut path: String) -> Result<NavElem> {
         }
 
         _ => {
-            if name.is_some() {
+            if name.is_none() {
                 bail!("{path} must be a .md file or a folder/");
             } else {
                 bail!("{path} must be a .md file, a folder/, or an include/*");
