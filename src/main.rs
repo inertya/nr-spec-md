@@ -90,7 +90,7 @@ fn run() -> Result<()> {
     let src = Path::new(&config.file.build.source);
 
     // this will read and process every file (specified in index navs)
-    let root = process_folder(&src, None)?;
+    let root = process_folder(&src.join("index.md"), None)?;
 
     // print unused files
     let DirCheck { unused, extra } = dir_check(&src, &root).context("dir check error")?;

@@ -89,16 +89,16 @@ pub fn extract_title_h1(content: &str) -> Result<String> {
     Ok(title)
 }
 
-pub fn take_front_matter(content: &str) -> Result<(FrontMatter, &str)> {
+pub fn take_front_matter(content: &str) -> Result<(Option<FrontMatter>, &str)> {
     let Some(s) = content.strip_prefix("---") else {
-        return Ok((FrontMatter::default(), content));
+        return Ok((None, content));
     };
 
     let Some((fm, remaining)) = s.split_once("\n---") else {
         bail!("unclosed front matter block")
     };
 
-    Ok((serde_yaml::from_str(fm)?, remaining))
+    Ok((Some(serde_yaml::from_str(fm)?), remaining))
 }
 
 pub fn prepend_front_matter(fm: &FrontMatter, content: &str) -> String {

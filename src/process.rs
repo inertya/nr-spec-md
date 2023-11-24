@@ -3,7 +3,7 @@ use crate::md;
 use crate::nav::{NavCategory, NavFolder, NavItem, NavPage};
 use crate::path::Path;
 use anyhow::{anyhow, bail, ensure, Result};
-use log::info;
+use log::{debug, info};
 use std::fs;
 
 pub fn process_item(elem: &NavElem, dir: &Path) -> Result<NavItem> {
@@ -15,6 +15,10 @@ pub fn process_item(elem: &NavElem, dir: &Path) -> Result<NavItem> {
                 .map(NavItem::Page)
         }
         NavElem::Folder { name, path } => {
+            // folder/ is implicitly folder/index.md
+            process_folder(&dir.join(path).join("index.md"), name.clone()).map(NavItem::Folder)
+        }
+        NavElem::TaggedIndex { name, path } => {
             process_folder(&dir.join(path), name.clone()).map(NavItem::Folder)
         }
         NavElem::Include { name, path } => {
@@ -30,6 +34,12 @@ fn process_page(path: &Path, name: Option<String>) -> Result<NavPage> {
     let raw = unwrap!(fs::read_to_string(path), "could not read file {path}",);
 
     let (fm, content) = unwrap!(md::take_front_matter(&raw), "invalid fm in {path}");
+
+    // don't debug print empty fm
+    if let Some(fm) = &fm {
+        debug!(target: "take_front_matter", "{path}: {fm:#?}");
+    }
+    let fm = fm.unwrap_or_default();
 
     let built_content = md::build(content);
     let fixed_content = md::fix(content);
@@ -65,7 +75,9 @@ fn process_page(path: &Path, name: Option<String>) -> Result<NavPage> {
 }
 
 pub fn process_folder(path: &Path, name: Option<String>) -> Result<NavFolder> {
-    let index = process_page(&path.join("index.md"), name)?;
+    let index = process_page(path, name)?;
+
+    let dir = path.parent().unwrap();
 
     ensure!(
         !index.fm.nav.is_empty(),
@@ -76,7 +88,7 @@ pub fn process_folder(path: &Path, name: Option<String>) -> Result<NavFolder> {
         .fm
         .nav
         .iter()
-        .map(|elem| process_item(elem, path))
+        .map(|elem| process_item(elem, &dir))
         .collect::<Result<Vec<NavItem>>>()?;
 
     Ok(NavFolder { index, children })
