@@ -13,7 +13,7 @@
 [GitHub]: https://img.shields.io/badge/GitHub--white?style=social&logo=github
 [Crates.io]: https://img.shields.io/badge/crates.io--white?style=social&logo=rust
 
-[crates-io]: https://crates.io/crate/nr-spec-md
+[crates-io]: https://crates.io/crates/nr-spec-md
 [github-com]: https://github.com/inertya/nr-spec-md
 
 This tool is used to help build and validate the inertya specification.
