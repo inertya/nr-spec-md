@@ -1,4 +1,5 @@
 use anyhow::{anyhow, bail, ensure, Result};
+use log::trace;
 use serde::{Deserialize, Serialize};
 use serde_yaml::{Mapping, Value};
 
@@ -31,6 +32,8 @@ pub enum NavElem {
 }
 
 fn parse_filename(name: Option<String>, mut path: String) -> Result<NavElem> {
+    trace!(target: "parse_filename", "name={name:?} path={path}");
+
     ensure!(path != "index.md", "cannot include index files directly");
 
     match path {

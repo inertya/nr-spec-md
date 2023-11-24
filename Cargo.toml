@@ -12,6 +12,8 @@ exclude = [".github"]
 [dependencies]
 anyhow = "1"
 semver = { version = "1", features = ["serde"] }
+log = "0.4"
+env_logger = "0.10"
 
 pulldown-cmark = "0.9"
 pulldown-cmark-to-cmark = "11"

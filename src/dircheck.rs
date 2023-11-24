@@ -1,8 +1,10 @@
 use crate::nav::NavFolder;
 use crate::path::Path;
 use anyhow::Result;
+use log::{debug, trace};
 use std::collections::HashSet;
 use std::fs;
+use std::fs::Metadata;
 
 pub struct DirCheck {
     pub unused: Vec<Path>,
@@ -13,6 +15,8 @@ pub struct DirCheck {
 // - .md files not in root (not in a nav)
 // - all !.md files
 pub fn dir_check(dir: &Path, root: &NavFolder) -> Result<DirCheck> {
+    trace!(target: "dir_check", "dir={dir:?}");
+
     let nav_paths = root
         .into_iter() // recursive iterator over all pages in the folder
         .map(|p| &p.path)
@@ -31,6 +35,8 @@ pub fn dir_check(dir: &Path, root: &NavFolder) -> Result<DirCheck> {
         }
     })?;
 
+    debug!(target: "dir_check", "extra: {extra:#?}");
+
     Ok(DirCheck { unused, extra })
 }
 
@@ -41,6 +47,11 @@ fn walk_dir_recursive(dir: &Path, cb: &mut impl FnMut(Path)) -> Result<()> {
         let entry = entry.unwrap();
         let path = Path::new(entry.path());
         let metadata = entry.metadata().unwrap();
+        trace!(
+            target: "walk_dir_recursive",
+            "{} {path}",
+            file_type_str(&metadata),
+        );
 
         if metadata.is_dir() {
             walk_dir_recursive(&path, cb)?;
@@ -50,4 +61,16 @@ fn walk_dir_recursive(dir: &Path, cb: &mut impl FnMut(Path)) -> Result<()> {
     }
 
     Ok(())
+}
+
+fn file_type_str(meta: &Metadata) -> &'static str {
+    if meta.is_file() {
+        "file"
+    } else if meta.is_dir() {
+        "dir "
+    } else if meta.is_symlink() {
+        "sym "
+    } else {
+        "??? "
+    }
 }

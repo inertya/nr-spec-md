@@ -6,6 +6,7 @@ use crate::modes::{mode_build, mode_check, mode_fix};
 use crate::path::Path;
 use crate::process::process_folder;
 use anyhow::{bail, ensure, Context, Result};
+use log::{debug, error, info, warn, LevelFilter};
 use semver::Version;
 use std::process::ExitCode;
 use std::time::Instant;
@@ -46,19 +47,25 @@ f, fix   - Fixes any style mistakes (will modify src/)
 ";
 
 fn main() -> ExitCode {
+    env_logger::Builder::new()
+        .filter_level(LevelFilter::Info)
+        .format_timestamp(None)
+        .parse_default_env()
+        .init();
+
     let start = Instant::now();
 
     let res = run();
 
-    println!("took {:?}", start.elapsed());
+    debug!(target: "", "took {:?}", start.elapsed());
 
     match res {
         Ok(()) => ExitCode::SUCCESS,
         Err(e) => {
-            eprintln!("Error: {e}");
+            error!(target: "", "Fatal: {e}");
             e.chain()
                 .skip(1)
-                .for_each(|cause| eprintln!("Caused By: {cause}"));
+                .for_each(|cause| error!(target: "", "Caused by: {cause}"));
             ExitCode::FAILURE
         }
     }
@@ -67,9 +74,11 @@ fn main() -> ExitCode {
 fn run() -> Result<()> {
     let version = Version::parse(env!("CARGO_PKG_VERSION")).unwrap();
 
-    println!("nr-spec-md v{version}");
+    info!(target: "nr-spec-md", "v{version}");
 
     let config = get_config()?;
+
+    debug!(target: "", "{config:#?}");
 
     ensure!(
         config.file.version_req.matches(&version),
@@ -88,7 +97,7 @@ fn run() -> Result<()> {
 
     unused
         .iter()
-        .for_each(|path| eprintln!("Unused file: {path}"));
+        .for_each(|path| warn!(target: "dir_check", "Unused Markdown File: {path}"));
 
     //
 
@@ -123,8 +132,6 @@ fn get_mode() -> Result<Mode> {
         }
         Some(s) => bail!("Unknown mode {s:?}, try `nr-spec-md help`"),
     };
-
-    println!("Mode: {mode:?}");
 
     Ok(mode)
 }

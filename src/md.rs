@@ -1,5 +1,6 @@
 use crate::front_matter::FrontMatter;
 use anyhow::{bail, Result};
+use log::trace;
 use pulldown_cmark::{Event, HeadingLevel, Options as CmOptions, Parser, Tag};
 use pulldown_cmark_to_cmark::Options as C2cOptions;
 
@@ -106,6 +107,11 @@ pub fn prepend_front_matter(fm: &FrontMatter, content: &str) -> String {
     };
 
     if map.is_empty() {
+        trace!(
+            target: "prepend_front_matter",
+            "skipping empty fm, content={:?}",
+            content.split_once('\n').map(|x| x.0).unwrap_or_default()
+        );
         // skip empty fm blocks
         content.to_string()
     } else {
