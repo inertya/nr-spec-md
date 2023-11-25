@@ -26,7 +26,7 @@ pub fn dir_check(dir: &Path, root: &NavFolder) -> Result<DirCheck> {
     let mut unused = Vec::new();
     let mut extra = Vec::new();
 
-    walk_dir_recursive(dir, |path| {
+    walk_dir_recursive(dir, &mut |path| {
         if path.extension() != Some("md".as_ref()) {
             // if it's not an .md file, it's extra
             extra.push(path);
@@ -41,7 +41,7 @@ pub fn dir_check(dir: &Path, root: &NavFolder) -> Result<DirCheck> {
     Ok(DirCheck { unused, extra })
 }
 
-fn walk_dir_recursive(dir: &Path, mut cb: impl FnMut(Path)) -> Result<()> {
+fn walk_dir_recursive(dir: &Path, cb: &mut impl FnMut(Path)) -> Result<()> {
     let read_dir = unwrap!(fs::read_dir(dir), "couldn't read dir {dir}");
 
     for entry in read_dir {
@@ -55,7 +55,7 @@ fn walk_dir_recursive(dir: &Path, mut cb: impl FnMut(Path)) -> Result<()> {
         );
 
         if metadata.is_dir() {
-            walk_dir_recursive(&path, &mut cb)?;
+            walk_dir_recursive(&path, cb)?;
         } else {
             cb(path);
         }
