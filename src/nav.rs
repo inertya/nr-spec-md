@@ -22,6 +22,7 @@ type NavPageIter<'a> = Once<&'a NavPage>;
 /// name is index.page.name (ignored for root)
 #[derive(Debug)]
 pub struct NavFolder {
+    // this may not be an index.md (if it was tagged in nav: `!index abc.md`)
     pub index: NavPage,
     pub children: Vec<NavItem>,
 }

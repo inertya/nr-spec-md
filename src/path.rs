@@ -33,6 +33,10 @@ impl Path {
     pub fn extension(&self) -> Option<&OsStr> {
         self.inner.extension()
     }
+
+    pub fn parent(&self) -> Option<Path> {
+        self.inner.parent().map(Path::new)
+    }
 }
 
 impl Debug for Path {
