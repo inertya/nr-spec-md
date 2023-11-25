@@ -87,8 +87,8 @@ pub fn process_folder(path: &Path, name: Option<String>) -> Result<NavFolder> {
     let children = index
         .fm
         .nav
-        .iter()
-        .cloned()
+        .clone()
+        .into_iter()
         .map(|elem| process_item(elem, &dir))
         .collect::<Result<Vec<NavItem>>>()?;
 
