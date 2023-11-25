@@ -107,7 +107,7 @@ pub fn process_include(dir: &Path, name: String) -> Result<NavCategory> {
 
     for entry in read_dir {
         let entry = entry.unwrap();
-        let path = Path::new(entry.path());
+        let path = Path::new_owned(entry.path());
         let metadata = entry.metadata().unwrap();
 
         if metadata.is_dir() {

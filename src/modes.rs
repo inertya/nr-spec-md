@@ -3,7 +3,6 @@ use crate::nav::NavFolder;
 use crate::path::Path;
 use anyhow::{anyhow, Result};
 use log::{debug, error, info};
-use std::convert::Infallible;
 use std::fs::File;
 use std::io::Write;
 
@@ -22,8 +21,7 @@ pub fn mode_check(root: &NavFolder) -> Result<()> {
     let mut total = 0;
     let mut fails = 0;
 
-    // Result<(), !>
-    let _ = root.into_iter().try_for_each(|page| {
+    root.for_each_page(|page| {
         total += 1;
 
         // TODO rich diff?
@@ -33,8 +31,6 @@ pub fn mode_check(root: &NavFolder) -> Result<()> {
         } else {
             debug!(target: "mode_check", "pass {}", page.path);
         }
-
-        Ok::<(), Infallible>(())
     });
 
     if fails == 0 {
@@ -51,7 +47,7 @@ pub fn mode_fix(root: &NavFolder) -> Result<()> {
     let mut fixed = 0;
     let mut total = 0;
 
-    root.into_iter().try_for_each(|page| {
+    root.try_for_each_page(|page| {
         total += 1;
 
         if page.fixed_content == page.raw_content {

@@ -14,13 +14,15 @@ pub struct Path {
 }
 
 impl Path {
-    pub fn new<T: AsRef<StdPath>>(path: T) -> Self {
-        Path {
-            inner: path.as_ref().to_path_buf(),
-        }
+    pub fn new(path: impl AsRef<StdPath>) -> Self {
+        Path::new_owned(path.as_ref().to_path_buf())
     }
 
-    pub fn join<T: AsRef<StdPath>>(&self, path: T) -> Self {
+    pub fn new_owned(buf: PathBuf) -> Self {
+        Path { inner: buf }
+    }
+
+    pub fn join(&self, path: impl AsRef<StdPath>) -> Self {
         let mut p = self.clone();
         p.inner.push(path);
         p
