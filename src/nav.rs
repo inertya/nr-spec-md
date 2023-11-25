@@ -44,37 +44,34 @@ pub enum NavItem {
 
 impl NavItem {
     #[allow(clippy::needless_lifetimes)] // ???
-    pub fn for_each_page<'s>(&'s self, mut f: impl FnMut(&'s NavPage)) {
+    pub fn for_each_page<'s>(&'s self, f: &mut impl FnMut(&'s NavPage)) {
         match self {
             NavItem::Page(x) => f(x),
             NavItem::Folder(x) => x.for_each_page(f),
-            NavItem::Category(x) => x.children.iter().for_each(|i| i.for_each_page(&mut f)),
+            NavItem::Category(x) => x.children.iter().for_each(|i| i.for_each_page(f)),
         }
     }
 
-    pub fn try_for_each_page(&self, mut f: impl FnMut(&NavPage) -> Result<()>) -> Result<()> {
+    pub fn try_for_each_page(&self, f: &mut impl FnMut(&NavPage) -> Result<()>) -> Result<()> {
         match self {
             NavItem::Page(x) => f(x),
             NavItem::Folder(x) => x.try_for_each_page(f),
-            NavItem::Category(x) => x
-                .children
-                .iter()
-                .try_for_each(|i| i.try_for_each_page(&mut f)),
+            NavItem::Category(x) => x.children.iter().try_for_each(|i| i.try_for_each_page(f)),
         }
     }
 }
 
 impl NavFolder {
     #[allow(clippy::needless_lifetimes)] // ???
-    pub fn for_each_page<'s>(&'s self, mut f: impl FnMut(&'s NavPage)) {
+    pub fn for_each_page<'s>(&'s self, f: &mut impl FnMut(&'s NavPage)) {
         f(&self.index);
-        self.children.iter().for_each(|i| i.for_each_page(&mut f));
+        self.children.iter().for_each(|i| i.for_each_page(f));
     }
 
-    pub fn try_for_each_page(&self, mut f: impl FnMut(&NavPage) -> Result<()>) -> Result<()> {
+    pub fn try_for_each_page(&self, f: &mut impl FnMut(&NavPage) -> Result<()>) -> Result<()> {
         f(&self.index)?;
         self.children
             .iter()
-            .try_for_each(|i| i.try_for_each_page(&mut f))
+            .try_for_each(|i| i.try_for_each_page(f))
     }
 }

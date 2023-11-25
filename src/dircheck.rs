@@ -19,7 +19,7 @@ pub fn dir_check(dir: &Path, root: &NavFolder) -> Result<DirCheck> {
 
     let mut nav_paths = HashSet::new();
 
-    root.for_each_page(|p| {
+    root.for_each_page(&mut |p| {
         nav_paths.insert(&p.path);
     });
 
