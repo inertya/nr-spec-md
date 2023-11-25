@@ -6,26 +6,26 @@ use anyhow::{anyhow, bail, ensure, Result};
 use log::{debug, info};
 use std::fs;
 
-pub fn process_item(elem: &NavElem, dir: &Path) -> Result<NavItem> {
+pub fn process_item(elem: NavElem, dir: &Path) -> Result<NavItem> {
     match elem {
         NavElem::File { name, path } => {
             // regular pages can't have nav
-            process_page(&dir.join(path), name.clone())
+            process_page(&dir.join(path), name)
                 .and_then(ensure_page_has_no_nav)
                 .map(NavItem::Page)
         }
         NavElem::Folder { name, path } => {
             // folder/ is implicitly folder/index.md
-            process_folder(&dir.join(path).join("index.md"), name.clone()).map(NavItem::Folder)
+            process_folder(&dir.join(path).join("index.md"), name).map(NavItem::Folder)
         }
         NavElem::TaggedIndex { name, path } => {
-            process_folder(&dir.join(path), name.clone()).map(NavItem::Folder)
+            process_folder(&dir.join(path), name).map(NavItem::Folder)
         }
         NavElem::Include { name, path } => {
-            process_include(&dir.join(path), name.clone()).map(NavItem::Category)
+            process_include(&dir.join(path), name).map(NavItem::Category)
         }
         NavElem::Category { name, elems } => {
-            process_category(dir, name.clone(), elems).map(NavItem::Category)
+            process_category(dir, name, elems).map(NavItem::Category)
         }
     }
 }
@@ -53,13 +53,13 @@ fn process_page(path: &Path, name: Option<String>) -> Result<NavPage> {
 
     // if fm specifies a name, use it over an assigned name
     // this is mainly only useful for the root index.md
-    let name = if let Some(fm_name) = fm.name.as_ref() {
+    let name = if let Some(fm_name) = fm.name.clone() {
         ensure!(
             name.is_none(),
             "cannot specify both a fm name and a nav name for {path}"
         );
 
-        fm_name.clone()
+        fm_name
     } else {
         name.unwrap_or(title_h1)
     };
@@ -88,6 +88,7 @@ pub fn process_folder(path: &Path, name: Option<String>) -> Result<NavFolder> {
         .fm
         .nav
         .iter()
+        .cloned()
         .map(|elem| process_item(elem, &dir))
         .collect::<Result<Vec<NavItem>>>()?;
 
@@ -133,9 +134,9 @@ pub fn process_include(dir: &Path, name: String) -> Result<NavCategory> {
     })
 }
 
-pub fn process_category(dir: &Path, name: String, elems: &[NavElem]) -> Result<NavCategory> {
+pub fn process_category(dir: &Path, name: String, elems: Vec<NavElem>) -> Result<NavCategory> {
     let children = elems
-        .iter()
+        .into_iter()
         .map(|elem| process_item(elem, dir))
         .collect::<Result<Vec<NavItem>>>()?;
 
