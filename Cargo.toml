@@ -1,6 +1,6 @@
 [package]
 name = "nr-spec-md"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2021"
 rust-version = "1.70" # keep in sync with .github/workflows/ci.yml
 description = "Build & Validation Tool for the Inertya Specification"

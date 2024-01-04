@@ -19,4 +19,7 @@
 This tool is used to help build and validate the inertya specification.
 
 
+**NOTICE:** This crate is deprecated and has been replaced with [nrdoc](https://crates.io/crates/nrdoc).
+
+
 License: MIT OR Apache-2.0
